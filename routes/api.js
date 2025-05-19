@@ -3,7 +3,9 @@ const express = require("express");
 const middlewares = require("kernels/middlewares");
 const { validate } = require("kernels/validations");
 const exampleController = require("modules/examples/controllers/exampleController");
+const videoCallController = require("../modules/videoCall/controllers/videoController")
 const router = express.Router({ mergeParams: true });
+
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -16,5 +18,11 @@ const router = express.Router({ mergeParams: true });
 router.group("/example", validate([]), (router) => {
   router.get('/', exampleController.exampleRequest)
 })
+
+// tạo phòng gọi
+router.post('/videocall/create-room', videoCallController.createRoom);
+
+router.post("/videocall/join-room/:videosession_id", videoCallController.joinRoom);
+
 
 module.exports = router;
