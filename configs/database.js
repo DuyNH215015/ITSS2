@@ -4,7 +4,7 @@ module.exports = {
   environment: process.env.DATABASE_ENV || "development",
   development: {
     username: process.env.DATABASE_USERNAME || "root",
-    password: process.env.DATABASE_PASSWORD || "manhvu123",
+    password: process.env.DATABASE_PASSWORD || null,
     database: process.env.DATABASE_NAME || "tts_blog_management_v2",
     host: process.env.DATABASE_HOST || "localhost",
     port: process.env.DATABASE_PORT || 3308,

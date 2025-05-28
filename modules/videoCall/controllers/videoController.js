@@ -25,6 +25,7 @@ const joinRoom = async (req, res) => {
 /** ✅ Chỉ xử lý join socket room, KHÔNG gọi DB nữa */
 const handleJoinRoom = (socket, roomId) => {
   try {
+    roomId = String(roomId); // Chuyển đổi roomId sang chuỗi nếu cần
     socket.join(roomId);
     console.log(`✅ ${socket.id} joined socket room ${roomId}`);
     socket.to(roomId).emit("user-joined", socket.id);
@@ -34,15 +35,15 @@ const handleJoinRoom = (socket, roomId) => {
 };
 
 const handleOffer = (socket, data) => {
-  socket.to(data.room).emit("offer", data);
+  socket.to(String(data.room)).emit("offer", data);
 };
 
 const handleAnswer = (socket, data) => {
-  socket.to(data.room).emit("answer", data);
+  socket.to(String(data.room)).emit("answer", data);
 };
 
 const handleIceCandidate = (socket, data) => {
-  socket.to(data.room).emit("ice-candidate", data);
+  socket.to(String(data.room)).emit("ice-candidate", data);
 };
 
 module.exports = {

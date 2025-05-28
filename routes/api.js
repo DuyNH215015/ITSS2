@@ -6,7 +6,7 @@ const exampleController = require("modules/examples/controllers/exampleControlle
 const videoCallController = require("../modules/videoCall/controllers/videoController")
 const searchPartnerController = require("../modules/searchPartner/controllers/searchController")
 const router = express.Router({ mergeParams: true });
-
+const userController = require("../modules/user/controllers/userControllers"); 
 
 // ===== EXAMPLE Request, make this commented =====
 // router.group("/posts",middlewares([authenticated, role("owner")]),(router) => {
@@ -30,5 +30,6 @@ router.post("/videocall/join-room/:videosession_id", videoCallController.joinRoo
 router.post("/search-partner/:userId", searchPartnerController.searchPartner);
 
 router.get("/search-partner/:userId", searchPartnerController.resultSearchPartner);
+router.post('/users/register', userController.createUser); 
 
 module.exports = router;
