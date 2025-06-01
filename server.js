@@ -6,7 +6,7 @@ const app = require("./index"); // index.js export Express instance
 // Import controller để xử lý WebRTC
 const videoCallController = require("./modules/videoCall/controllers/videoController");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 // Tạo HTTP Server để dùng chung cho cả Express và WebSocket
 const server = http.createServer(app);
