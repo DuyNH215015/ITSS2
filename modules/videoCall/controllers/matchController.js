@@ -9,25 +9,42 @@ const videoCallService = require("../../videoCall/services/videoCallService");
  * - Nếu không có → tạo phòng mới và chờ người khác
  */
 const matchOrJoin = async (req, res) => {
-  const { user_id, language, topic, level } = req.body;
+  let { user_id, language, topic, level } = req.body;
 
   try {
-    // Tìm người khác đang đợi có cùng tiêu chí
+    // Convert comma-separated strings to arrays
+    const languageArr = language ? language.split(",") : [];
+    const topicArr = topic ? topic.split(",") : [];
+
+    // Find another waiting user with at least one common language and topic
     const existingQueue = await db.Queue.findOne({
       where: {
         user_id: { [Op.ne]: user_id },
-        language,
-        topic,
         level,
         status: "waiting",
-      },
+      }
     });
 
+    let matchedQueue = null;
+
     if (existingQueue) {
-      // Tìm session tương ứng với người đang chờ đó
+      // Check for at least one common language and topic
+      const existingLanguages = existingQueue.language ? existingQueue.language.split(",") : [];
+      const existingTopics = existingQueue.topic ? existingQueue.topic.split(",") : [];
+
+      const hasCommonLanguage = languageArr.some(l => existingLanguages.includes(l));
+      const hasCommonTopic = topicArr.some(t => existingTopics.includes(t));
+
+      if (hasCommonLanguage && hasCommonTopic) {
+        matchedQueue = existingQueue;
+      }
+    }
+
+    if (matchedQueue) {
+      // Find the corresponding session
       const session = await db.VideoSession.findOne({
         where: {
-          user1_id: existingQueue.user_id,
+          user1_id: matchedQueue.user_id,
           user2_id: null,
         },
       });
@@ -36,11 +53,11 @@ const matchOrJoin = async (req, res) => {
         return res.status(400).json({ error: "Không tìm thấy phòng hợp lệ cho hàng đợi." });
       }
 
-      // Ghép người dùng mới vào phòng đó
+      // Join the new user to the session
       const result = await videoCallService.joinRoom(session.videosession_id, user_id);
 
-      // Xoá hàng đợi của người cũ
-      await db.Queue.destroy({ where: { queue_id: existingQueue.queue_id } });
+      // Remove the old queue entry
+      await db.Queue.destroy({ where: { queue_id: matchedQueue.queue_id } });
 
       return res.json({
         matched: true,
